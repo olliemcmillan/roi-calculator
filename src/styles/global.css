@@ -1,21 +1,21 @@
 :root {
-  --bg: #14110e;
-  --bg-2: #1c1814;
-  --paper: #221d18;
-  --line: rgba(244, 232, 210, 0.12);
-  --line-strong: rgba(244, 232, 210, 0.22);
-  --cream: #f4e8d2;
-  --cream-dim: #c9bba3;
-  --muted: #8f8474;
-  --rust: #d36a2f;
-  --rust-soft: rgba(211, 106, 47, 0.16);
-  --gold: #e3b25c;
-  --sage: #9db892;
-  --negative: #e07a6a;
-  --shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
-  --radius: 22px;
-  --sans: "Geist", "Segoe UI", sans-serif;
-  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --bg: #fdfcfa;
+  --bg-2: #fff;
+  --paper: #eeeff0;
+  --line: hsla(205.71, 4.65%, 40.13%, 0.18);
+  --line-strong: hsla(205.71, 4.65%, 40.13%, 0.35);
+  --cream: #1a1a1b;
+  --cream-dim: hsla(205.71, 4.65%, 40.13%, 1);
+  --muted: hsla(207.27, 4.67%, 60.14%, 1);
+  --rust: #1a1a1b;
+  --rust-soft: hsla(205.71, 4.65%, 40.13%, 0.12);
+  --gold: #1a1a1b;
+  --sage: #3f7a3a;
+  --negative: #d14424;
+  --shadow: none;
+  --radius: 0.4rem;
+  --sans: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --serif: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
 * {
@@ -32,9 +32,7 @@ body {
 }
 
 body {
-  background-image:
-    radial-gradient(1200px 700px at 85% -10%, rgba(211, 106, 47, 0.16), transparent 55%),
-    radial-gradient(900px 500px at -10% 20%, rgba(227, 178, 92, 0.08), transparent 50%);
+  background-color: var(--bg);
 }
 
 button,
@@ -104,7 +102,7 @@ h1 {
   font-weight: 400;
   font-size: clamp(42px, 7vw, 84px);
   line-height: 0.92;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.05em;
 }
 
 .lede {
@@ -128,11 +126,9 @@ h1 {
 }
 
 .panel {
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(16px);
 }
 
 .panel-inner {
@@ -197,7 +193,7 @@ input[type="number"] {
   background: var(--bg-2);
   border: 1px solid var(--line);
   color: var(--cream);
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 12px 14px;
 }
 
