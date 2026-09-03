@@ -1,0 +1,452 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { PRESETS } from "../lib/roi";
+
+const defaultPreset = PRESETS["lead-gen"];
+---
+
+<Layout
+  title="ROI calculator"
+  description="A small Astro app that estimates the return on a website or conversion-rate improvement."
+>
+  <main class="shell">
+    <header class="topbar">
+      <a class="mark" href="/">
+        <span class="mark-dot" aria-hidden="true"></span>
+        <span>ROI calculator</span>
+      </a>
+      <div class="toggle" role="group" aria-label="Currency">
+        <button type="button" data-currency="GBP" aria-pressed="true">GBP</button>
+        <button type="button" data-currency="USD" aria-pressed="false">USD</button>
+        <button type="button" data-currency="EUR" aria-pressed="false">EUR</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <p class="kicker">Growth maths, without the spreadsheet</p>
+      <h1>What is a sharper site actually worth?</h1>
+      <p class="lede">
+        Plug in traffic, conversion rate, and the lift you expect from a better
+        site. The numbers update as you type.
+      </p>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="presets" role="group" aria-label="Example businesses">
+            {
+              Object.entries(PRESETS).map(([id, preset]) => (
+                <button
+                  type="button"
+                  class="chip"
+                  data-preset={id}
+                  aria-pressed={id === "lead-gen" ? "true" : "false"}
+                >
+                  {preset.label}
+                </button>
+              ))
+            }
+          </div>
+          <p class="note" data-preset-blurb>{defaultPreset.blurb}</p>
+
+          <form id="roi-form" novalidate>
+            <div class="field">
+              <div class="field-head">
+                <label for="visitors">Monthly visitors</label>
+                <span class="value-readout" data-out="visitors"></span>
+              </div>
+              <input
+                id="visitors"
+                name="visitors"
+                type="range"
+                min="500"
+                max="200000"
+                step="500"
+                value={defaultPreset.visitors}
+              />
+              <input
+                type="number"
+                name="visitorsNumber"
+                min="0"
+                max="1000000"
+                step="100"
+                value={defaultPreset.visitors}
+                aria-label="Monthly visitors exact value"
+              />
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <div class="field-head">
+                  <label for="conversionRate">Current conversion</label>
+                  <span class="value-readout" data-out="conversionRate"></span>
+                </div>
+                <input
+                  id="conversionRate"
+                  name="conversionRate"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={defaultPreset.conversionRate}
+                />
+              </div>
+              <div class="field">
+                <div class="field-head">
+                  <label for="averageValue">Value per conversion</label>
+                  <span class="value-readout" data-out="averageValue"></span>
+                </div>
+                <input
+                  id="averageValue"
+                  name="averageValue"
+                  type="number"
+                  min="0"
+                  max="100000"
+                  step="5"
+                  value={defaultPreset.averageValue}
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="field-head">
+                <label for="liftPercent">Expected conversion lift</label>
+                <span class="value-readout" data-out="liftPercent"></span>
+              </div>
+              <input
+                id="liftPercent"
+                name="liftPercent"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value={defaultPreset.liftPercent}
+              />
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <div class="field-head">
+                  <label for="investment">Investment</label>
+                  <span class="value-readout" data-out="investment"></span>
+                </div>
+                <input
+                  id="investment"
+                  name="investment"
+                  type="number"
+                  min="0"
+                  max="1000000"
+                  step="100"
+                  value={defaultPreset.investment}
+                />
+              </div>
+              <div class="field">
+                <div class="field-head">
+                  <label for="months">Time horizon</label>
+                  <span class="value-readout" data-out="months"></span>
+                </div>
+                <input
+                  id="months"
+                  name="months"
+                  type="number"
+                  min="1"
+                  max="60"
+                  step="1"
+                  value={defaultPreset.months}
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <span id="investment-type-label">Investment type</span>
+              <div class="toggle" role="group" aria-labelledby="investment-type-label">
+                <button type="button" data-type="one-time" aria-pressed="true">
+                  One-off project
+                </button>
+                <button type="button" data-type="monthly" aria-pressed="false">
+                  Monthly retainer
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <aside class="panel results">
+        <div class="panel-inner">
+          <div class="results-hero" aria-live="polite">
+            <p>Estimated ROI</p>
+            <strong data-result="roiPercent">0%</strong>
+            <span class="note" data-result="summary"></span>
+          </div>
+          <div class="metrics">
+            <div class="metric">
+              <span>New conversion rate</span>
+              <b data-result="newRate"></b>
+            </div>
+            <div class="metric">
+              <span>Extra conversions / month</span>
+              <b data-result="extraConversions"></b>
+            </div>
+            <div class="metric">
+              <span>Extra revenue / month</span>
+              <b data-result="extraMonthly"></b>
+            </div>
+            <div class="metric">
+              <span>Extra revenue over horizon</span>
+              <b data-result="extraHorizon"></b>
+            </div>
+            <div class="metric">
+              <span>Total investment</span>
+              <b data-result="totalInvestment"></b>
+            </div>
+            <div class="metric">
+              <span>Net return</span>
+              <b data-result="netReturn"></b>
+            </div>
+            <div class="metric">
+              <span>Payback</span>
+              <b data-result="paybackMonths"></b>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" class="ghost" data-copy>Copy results</button>
+            <button type="button" class="ghost" data-share>Copy share link</button>
+          </div>
+          <p class="note">
+            This is a directional model, not a forecast. It assumes the lift
+            holds across the horizon and that conversion value stays constant.
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="foot">
+      <span>Built with Astro for Webflow Cloud.</span>
+      <span>No data leaves the browser.</span>
+    </footer>
+  </main>
+</Layout>
+
+<script>
+  import {
+    PRESETS,
+    calculateRoi,
+    formatCurrency,
+    formatNumber,
+    formatPayback,
+    formatPercent,
+    type Currency,
+    type InvestmentType,
+    type RoiInputs,
+  } from "../lib/roi";
+
+  const form = document.querySelector<HTMLFormElement>("#roi-form");
+  if (!form) throw new Error("ROI form missing");
+
+  const visitorsRange = form.elements.namedItem("visitors") as HTMLInputElement;
+  const visitorsNumber = form.elements.namedItem("visitorsNumber") as HTMLInputElement;
+  const conversionRate = form.elements.namedItem("conversionRate") as HTMLInputElement;
+  const averageValue = form.elements.namedItem("averageValue") as HTMLInputElement;
+  const liftPercent = form.elements.namedItem("liftPercent") as HTMLInputElement;
+  const investment = form.elements.namedItem("investment") as HTMLInputElement;
+  const months = form.elements.namedItem("months") as HTMLInputElement;
+  const presetBlurb = document.querySelector("[data-preset-blurb]");
+  const copyButton = document.querySelector("[data-copy]");
+  const shareButton = document.querySelector("[data-share]");
+
+  let currency: Currency = "GBP";
+  let investmentType: InvestmentType = "one-time";
+
+  function num(input: HTMLInputElement): number {
+    return Number.parseFloat(input.value) || 0;
+  }
+
+  function readInputs(): RoiInputs {
+    return {
+      visitors: num(visitorsNumber),
+      conversionRate: num(conversionRate),
+      averageValue: num(averageValue),
+      liftPercent: num(liftPercent),
+      investment: num(investment),
+      months: num(months),
+      investmentType,
+    };
+  }
+
+  function applyInputs(next: RoiInputs) {
+    visitorsRange.value = String(Math.min(200000, next.visitors));
+    visitorsNumber.value = String(next.visitors);
+    conversionRate.value = String(next.conversionRate);
+    averageValue.value = String(next.averageValue);
+    liftPercent.value = String(next.liftPercent);
+    investment.value = String(next.investment);
+    months.value = String(next.months);
+    investmentType = next.investmentType;
+    document.querySelectorAll<HTMLButtonElement>("[data-type]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.type === investmentType));
+    });
+  }
+
+  function write(name: string, value: string) {
+    document.querySelectorAll(`[data-out="${name}"], [data-result="${name}"]`).forEach((node) => {
+      node.textContent = value;
+    });
+  }
+
+  function render() {
+    const inputs = readInputs();
+    const result = calculateRoi(inputs);
+
+    write("visitors", formatNumber(inputs.visitors, 0));
+    write("conversionRate", formatPercent(inputs.conversionRate));
+    write("averageValue", formatCurrency(inputs.averageValue, currency));
+    write("liftPercent", `+${formatPercent(inputs.liftPercent, 0)}`);
+    write("investment", formatCurrency(inputs.investment, currency));
+    write("months", `${inputs.months} month${inputs.months === 1 ? "" : "s"}`);
+    write("newRate", formatPercent(result.newRate * 100));
+    write("extraConversions", formatNumber(result.extraConversions));
+    write("extraMonthly", formatCurrency(result.extraMonthly, currency));
+    write("extraHorizon", formatCurrency(result.extraHorizon, currency));
+    write("totalInvestment", formatCurrency(result.totalInvestment, currency));
+    write("netReturn", formatCurrency(result.netReturn, currency));
+    write("paybackMonths", formatPayback(result.paybackMonths));
+    write("roiPercent", formatPercent(result.roiPercent, 0));
+
+    const roiNode = document.querySelector("[data-result='roiPercent']");
+    roiNode?.classList.toggle("positive", result.roiPercent >= 0);
+    roiNode?.classList.toggle("negative", result.roiPercent < 0);
+
+    write(
+      "summary",
+      result.netReturn >= 0
+        ? `Pays back in ${formatPayback(result.paybackMonths)} on a ${inputs.months}-month horizon.`
+        : "The lift does not cover the investment in this window.",
+    );
+  }
+
+  function syncFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    const presetId = params.get("preset");
+    if (presetId && PRESETS[presetId]) {
+      applyInputs(PRESETS[presetId]);
+      document.querySelectorAll<HTMLButtonElement>("[data-preset]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.preset === presetId));
+      });
+      if (presetBlurb) presetBlurb.textContent = PRESETS[presetId].blurb;
+    }
+
+    const nextCurrency = params.get("currency");
+    if (nextCurrency === "GBP" || nextCurrency === "USD" || nextCurrency === "EUR") {
+      currency = nextCurrency;
+      document.querySelectorAll<HTMLButtonElement>("[data-currency]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.currency === currency));
+      });
+    }
+
+    const fields: Array<keyof RoiInputs> = [
+      "visitors",
+      "conversionRate",
+      "averageValue",
+      "liftPercent",
+      "investment",
+      "months",
+    ];
+    const current = readInputs();
+    for (const field of fields) {
+      const raw = params.get(field);
+      if (raw !== null) current[field] = Number(raw) as never;
+    }
+    const type = params.get("investmentType");
+    if (type === "one-time" || type === "monthly") current.investmentType = type;
+    applyInputs(current);
+  }
+
+  function shareUrl(): string {
+    const inputs = readInputs();
+    const params = new URLSearchParams({
+      visitors: String(inputs.visitors),
+      conversionRate: String(inputs.conversionRate),
+      averageValue: String(inputs.averageValue),
+      liftPercent: String(inputs.liftPercent),
+      investment: String(inputs.investment),
+      months: String(inputs.months),
+      investmentType: inputs.investmentType,
+      currency,
+    });
+    return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+  }
+
+  async function copy(text: string, button: Element | null, label: string) {
+    await navigator.clipboard.writeText(text);
+    if (!(button instanceof HTMLButtonElement)) return;
+    const previous = button.textContent;
+    button.textContent = label;
+    window.setTimeout(() => {
+      button.textContent = previous;
+    }, 1600);
+  }
+
+  visitorsRange.addEventListener("input", () => {
+    visitorsNumber.value = visitorsRange.value;
+    render();
+  });
+  visitorsNumber.addEventListener("input", () => {
+    visitorsRange.value = String(Math.min(200000, num(visitorsNumber)));
+    render();
+  });
+  form.addEventListener("input", render);
+
+  document.querySelectorAll<HTMLButtonElement>("[data-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.preset;
+      if (!id || !PRESETS[id]) return;
+      applyInputs(PRESETS[id]);
+      document.querySelectorAll<HTMLButtonElement>("[data-preset]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+      if (presetBlurb) presetBlurb.textContent = PRESETS[id].blurb;
+      render();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>("[data-currency]").forEach((button) => {
+    button.addEventListener("click", () => {
+      currency = (button.dataset.currency as Currency) ?? "GBP";
+      document.querySelectorAll<HTMLButtonElement>("[data-currency]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+      render();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>("[data-type]").forEach((button) => {
+    button.addEventListener("click", () => {
+      investmentType = (button.dataset.type as InvestmentType) ?? "one-time";
+      document.querySelectorAll<HTMLButtonElement>("[data-type]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+      render();
+    });
+  });
+
+  copyButton?.addEventListener("click", async () => {
+    const inputs = readInputs();
+    const result = calculateRoi(inputs);
+    const text = [
+      `ROI: ${formatPercent(result.roiPercent, 0)}`,
+      `Net return: ${formatCurrency(result.netReturn, currency)}`,
+      `Extra monthly revenue: ${formatCurrency(result.extraMonthly, currency)}`,
+      `Payback: ${formatPayback(result.paybackMonths)}`,
+    ].join("\n");
+    await copy(text, copyButton, "Copied");
+  });
+
+  shareButton?.addEventListener("click", async () => {
+    await copy(shareUrl(), shareButton, "Link copied");
+  });
+
+  syncFromQuery();
+  render();
+</script>
